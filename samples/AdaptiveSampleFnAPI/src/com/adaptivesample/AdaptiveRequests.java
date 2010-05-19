@@ -70,7 +70,7 @@ public class AdaptiveRequests {
 
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -169,7 +169,7 @@ public class AdaptiveRequests {
 
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -263,7 +263,7 @@ public class AdaptiveRequests {
 			HttpServletResponse resp, APICredential credentialObj) throws IOException  {
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -389,7 +389,7 @@ public class AdaptiveRequests {
 			HttpServletResponse resp, APICredential credentialObj) throws IOException  {
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -510,7 +510,7 @@ public class AdaptiveRequests {
 			HttpServletResponse resp, APICredential credentialObj) throws IOException  {
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -657,7 +657,7 @@ public class AdaptiveRequests {
 			HttpServletResponse resp, APICredential credentialObj) throws IOException  {
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -799,7 +799,7 @@ public class AdaptiveRequests {
 
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -911,7 +911,7 @@ public class AdaptiveRequests {
 
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -1033,7 +1033,7 @@ public class AdaptiveRequests {
 			HttpServletResponse resp, APICredential credentialObj) throws IOException {
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -1129,7 +1129,7 @@ public class AdaptiveRequests {
 			HttpServletResponse resp, APICredential credentialObj) throws IOException {
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -1254,7 +1254,7 @@ public class AdaptiveRequests {
 		
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Chained Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 
@@ -1397,7 +1397,7 @@ public class AdaptiveRequests {
 
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 			
@@ -1474,7 +1474,7 @@ public class AdaptiveRequests {
 
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 			
@@ -1546,7 +1546,7 @@ public class AdaptiveRequests {
 
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 			
@@ -1640,7 +1640,7 @@ public class AdaptiveRequests {
 	
 		resp.setContentType("text/html");
 		resp.getWriter().println("<html><head><title>Simple Pay Response & Payment Details</title></head><body>");
-		resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
+		resp.getWriter().println("<a href=\"/adaptivesamplefnapi\">Home</a> <br/>");
 		
 		try {
 			ConvertCurrency convCurrency = new ConvertCurrency();
