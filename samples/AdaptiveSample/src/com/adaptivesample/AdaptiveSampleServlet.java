@@ -1,6 +1,9 @@
 package com.adaptivesample;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -17,6 +20,10 @@ import com.paypal.adaptive.api.responses.PreapprovalResponse;
 import com.paypal.adaptive.api.responses.RefundResponse;
 import com.paypal.adaptive.core.APICredential;
 import com.paypal.adaptive.core.AckCode;
+import com.paypal.adaptive.core.CurrencyConversionList;
+import com.paypal.adaptive.core.CurrencyType;
+import com.paypal.adaptive.core.PaymentInfo;
+import com.paypal.adaptive.core.Receiver;
 import com.paypal.adaptive.core.ServiceEnvironment;
 
 
@@ -26,6 +33,7 @@ public class AdaptiveSampleServlet extends HttpServlet {
 
 
 	private static APICredential credentialObj;
+	PaymentDetailsResponse payDetailsResp;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -78,15 +86,45 @@ public class AdaptiveSampleServlet extends HttpServlet {
 					resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 					String payKey = req.getParameter("payKey");
 					PaymentDetailsResponse payDetailsResp = 
-						AdaptiveRequests.processPaymentDetails(resp, payKey, null, null, credentialObj);
-					resp.getWriter().println( payDetailsResp.getPaymentDetails().getStatus());
+					AdaptiveRequests.processPaymentDetails(resp, payKey, null, null, credentialObj);
+					
+					if (payDetailsResp.getPayErrorList().isEmpty())
+					{
+					PrintWriter out = resp.getWriter();
+					out.print("<br/> Status: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getStatus(), "UTF-8"));
+					out.print("<br/> PayKey: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getPayKey(), "UTF-8"));
+					out.print("<br/> Cancel URL: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getCancelUrl(), "UTF-8"));
+					out.print("<br/> Return URL: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getReturnUrl(), "UTF-8"));
+					out.print("<br/> Sender Email: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getSenderEmail(), "UTF-8"));
+					
+					ArrayList<PaymentInfo> tmp = payDetailsResp.getPaymentDetails().getPaymentInfoList();
+					
+					for(int i=0;i<tmp.size();i++)
+						{
+						PaymentInfo test = tmp.get(i);
+						Receiver testRev = test.getReceiver();
+						out.print("<p><h3>Receiver " + (i+1) + "</h3></p>");
+						out.print("<br/>Amount: " +testRev.getAmount());
+						out.print("<br/>Email: " +URLDecoder.decode(testRev.getEmail(), "UTF-8"));
+						out.print("<br/>Primary: " +testRev.isPrimary());
+						}
+					out.print("<br/><br/>PayDetails Success");
+					}
+					
+					
+					
+
 				} else if(action != null && action.equals("preapproval")){
 					resp.getWriter().println("<html><head><title>Preapproval status</title></head><body>");
 					resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 					String preapprovalKey = req.getParameter("preapprovalKey");
 					PreapprovalDetailsResponse preapprovalDetailsResp = 						 
 						AdaptiveRequests.processPreapprovalDetails(resp, preapprovalKey, true, credentialObj);
-					resp.getWriter().println( preapprovalDetailsResp.getPreapprovalDetails().getStatus());
+					
+					PrintWriter out = resp.getWriter();
+					out.println("<br/> PreApproval Key: " + URLDecoder.decode(preapprovalKey,"UTF-8"));
+					out.println("<br/> Status: " + URLDecoder.decode(preapprovalDetailsResp.getPreapprovalDetails().getStatus(),"UTF-8"));
+					out.println("<br/> Pin Type: " + URLDecoder.decode(preapprovalDetailsResp.getPreapprovalDetails().getPinType().toString(),"UTF-8"));
 				}
 				resp.getWriter().println("</body></html>");
 			} else { 
@@ -147,20 +185,44 @@ public class AdaptiveSampleServlet extends HttpServlet {
 			
 		} else if (action != null && action.equals("payDetails")) {
 			resp.setContentType("text/html");
-			resp.getWriter().println("<html><head><title>Preapproval Details</title></head><body>");
+			resp.getWriter().println("<html><head><title>Pay Details</title></head><body>");
 			resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 
 			String payKey = req.getParameter("payKey");
-			if(payKey != null){
-				PaymentDetailsResponse payDetailsResp = 
-					AdaptiveRequests.processPaymentDetails(resp, payKey, null, null, credentialObj);
-
-				resp.getWriter().println( payDetailsResp.getPaymentDetails().getStatus());
-
-			}  else {
-				resp.getWriter().println("PayDetails Failed");
+			if(payKey != ""){
+				payDetailsResp = 
+					AdaptiveRequests.processPaymentDetails(resp, payKey, null, null, credentialObj);	
+				if (payDetailsResp.getPayErrorList().isEmpty())
+					{
+					PrintWriter out = resp.getWriter();
+					out.print("<br/> Status: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getStatus(), "UTF-8"));
+					out.print("<br/> PayKey: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getPayKey(), "UTF-8"));
+					out.print("<br/> Cancel URL: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getCancelUrl(), "UTF-8"));
+					out.print("<br/> Return URL: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getReturnUrl(), "UTF-8"));
+					out.print("<br/> Sender Email: " + URLDecoder.decode(payDetailsResp.getPaymentDetails().getSenderEmail(), "UTF-8"));
+					
+					ArrayList<PaymentInfo> tmp = payDetailsResp.getPaymentDetails().getPaymentInfoList();
+					
+					for(int i=0;i<tmp.size();i++)
+						{
+						PaymentInfo test = tmp.get(i);
+						Receiver testRev = test.getReceiver();
+						out.print("<p><h3>Receiver " + (i+1) + "</h3></p>");
+						out.print("<br/>Amount: " +testRev.getAmount());
+						out.print("<br/>Email: " +URLDecoder.decode(testRev.getEmail(), "UTF-8"));
+						out.print("<br/>Primary: " +testRev.isPrimary());
+						}
+					out.print("<br/>PayDetails Success");
+					}
+				else
+					{
+					resp.getWriter().println("<br/>PayDetails Failed");
+					}
 			}
-
+			else
+			{
+				resp.getWriter().println("Please enter a pay key!!!");	
+			}
 			resp.getWriter().println("</body></html>");
 		} else if (action != null && action.equals("preapproval")) {
 			resp.setContentType("text/html");
@@ -168,9 +230,10 @@ public class AdaptiveSampleServlet extends HttpServlet {
 			resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 
 			PreapprovalResponse preapprovalResp = AdaptiveRequests.processPreapprovalRequest(req, resp, credentialObj);
-			resp.getWriter().println( preapprovalResp.toString());
-
-			// session.setAttribute("payResponseRef", payResp);
+			//resp.getWriter().println( preapprovalResp.toString());
+			resp.getWriter().println( preapprovalResp.getPreapprovalKey());
+			
+			
 			if(preapprovalResp != null) {
 				if(preapprovalResp.getErrorList() != null && preapprovalResp.getErrorList().size() > 0) {
 					// error occured
@@ -210,10 +273,12 @@ public class AdaptiveSampleServlet extends HttpServlet {
 					PreapprovalDetailsResponse payDetailsResp = 
 						AdaptiveRequests.processPreapprovalDetails(resp, preapprovalKey, true, credentialObj);
 
-					resp.getWriter().println( payDetailsResp.getPreapprovalDetails().getStatus());
-
+					resp.getWriter().println("<br/> Status: " + payDetailsResp.getPreapprovalDetails().getStatus());
+					resp.getWriter().println("<br/> Start Date: " + URLDecoder.decode(payDetailsResp.getPreapprovalDetails().getStartingDate(), "UTF-8"));
+					resp.getWriter().println("<br/> End Date: " + URLDecoder.decode(payDetailsResp.getPreapprovalDetails().getEndingDate(), "UTF-8"));
+					resp.getWriter().println("<br/> Sender: " + URLDecoder.decode(payDetailsResp.getPreapprovalDetails().getSenderEmail() ,"UTF-8"));
 			}  else {
-				resp.getWriter().println("PreapprovalDetails Failed");
+				resp.getWriter().println("Preapproval Details Failed");
 			}
 
 			resp.getWriter().println("</body></html>");
@@ -226,11 +291,11 @@ public class AdaptiveSampleServlet extends HttpServlet {
 			if(preapprovalKey != null){
 				CancelPreapprovalResponse cancelPreapprovalResp = 
 						AdaptiveRequests.processCancelPreapproval(resp, preapprovalKey, credentialObj);
-
-					resp.getWriter().println( cancelPreapprovalResp.toString());
+					
+				resp.getWriter().println("Result: "+ cancelPreapprovalResp.getResponseEnvelope().getAck().toString());
 
 			}  else {
-				resp.getWriter().println("PreapprovalDetails Failed");
+				resp.getWriter().println("Cancel Preapproval Failed");
 			}
 
 			resp.getWriter().println("</body></html>");
@@ -253,10 +318,33 @@ public class AdaptiveSampleServlet extends HttpServlet {
 
 			ConvertCurrencyResponse currConvertResp = 
 					AdaptiveRequests.processCurrencyConversion(req, resp, credentialObj);
-
-			resp.getWriter().println( currConvertResp.toString());
-
-
+			
+			
+			PrintWriter out = resp.getWriter();
+			if (currConvertResp.getErrorList().isEmpty())
+				{
+				ArrayList<CurrencyConversionList> tmp = currConvertResp.getEstimatedAmountTable();
+				
+				for(int i=0;i<tmp.size();i++)
+						{
+							CurrencyConversionList test = tmp.get(i);
+							CurrencyType testBase = test.getBaseAmount();
+							ArrayList<CurrencyType> convCurr = test.getCurrencyList();
+			
+							out.print("<p><h3>Currency " + (i+1) + "</h3></p>");
+							out.print("<br/>Base Amount: " +testBase.getAmount() + " " + testBase.getCode() );
+							for(int j=0; j<convCurr.size(); j++)
+								{
+								CurrencyType convertedCurrency = convCurr.get(j);
+								out.print("<br/> Converted Amount: " +convertedCurrency.getAmount()+ " " +convertedCurrency.getCode());
+								}
+						}
+					out.print("<br/><br/>Conversion Success");
+					}
+			else
+				{
+				resp.getWriter().println("<br/> Error Occured");		
+				}
 			resp.getWriter().println("</body></html>");
 		
 		} else {
