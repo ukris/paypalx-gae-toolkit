@@ -114,7 +114,7 @@ public class CancelPreapprovalRequest {
     		log.info("Sending CancePreapprovalRequest with: " + postParameters.toString());
     	
     	try {
-            URL url = new URL(EndPointUrl.get(this.env) + "PaymentDetails");
+            URL url = new URL(EndPointUrl.get(this.env) + "CancelPreapproval");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             // method is always POST

@@ -109,12 +109,10 @@ public class AdaptiveRequests {
 			resp.getWriter().println( payRequest.toString());
 			
 			PayResponse payResp = payRequest.execute(credentialObj);
-			resp.getWriter().println( payResp.toString());
-
-			// session.setAttribute("payResponseRef", payResp);
+			
 			if(payResp != null) {
 				if(payResp.getPayErrorList() != null && payResp.getPayErrorList().size() > 0) {
-					// error occured
+					// error occurred
 
 				} else {
 
@@ -124,7 +122,7 @@ public class AdaptiveRequests {
 					resp.getWriter().println( payDetailsResp.toString());
 
 
-					// generate authurization url
+					// generate authorisation URL
 					if (payResp.isPaymentCOMPLETED()) {
 						resp.getWriter().println("Payment COMPLETED.");
 					} else {
@@ -215,8 +213,6 @@ public class AdaptiveRequests {
 			if(trackingId != null)
 				paymentDetailsRequest.setTrackingId(trackingId);
 			
-			resp.getWriter().println( paymentDetailsRequest.toString());
-			
 			PaymentDetailsResponse response = paymentDetailsRequest.execute(credentialObj);
 			
 			return response;
@@ -278,8 +274,6 @@ public class AdaptiveRequests {
 			
 			// set preapproval details
 			preapprovalRequest.setPreapprovalDetails(preapprovalDetails);
-			
-			resp.getWriter().println( preapprovalRequest.toString());
 			
 			PreapprovalResponse payResp = preapprovalRequest.execute(credentialObj);
 			return payResp;
@@ -358,9 +352,6 @@ public class AdaptiveRequests {
 			
 			preapprovalDetailsRequest.setGetBillingAddress(getBillingAddress);
 			
-			
-			resp.getWriter().println( preapprovalDetailsRequest.toString());
-			
 			PreapprovalDetailsResponse response = preapprovalDetailsRequest.execute(credentialObj);
 			
 			return response;
@@ -393,10 +384,6 @@ public class AdaptiveRequests {
 
 			if(preapprovalKey != null)
 				cancelPreapprovalRequest.setPreapprovalKey(preapprovalKey);
-			
-			
-			
-			resp.getWriter().println( cancelPreapprovalRequest.toString());
 			
 			CancelPreapprovalResponse response = cancelPreapprovalRequest.execute(credentialObj);
 						
@@ -510,9 +497,6 @@ public class AdaptiveRequests {
 					currReq.addToConvertToCurrencyList(CurrencyCodes.valueOf(tocode));
 				}
 			}
-			
-			resp.getWriter().println( currReq.toString());
-			
 			ConvertCurrencyResponse response = currReq.execute(credentialObj);
 			
 			return response;
