@@ -153,6 +153,7 @@ public class ConvertCurrencyRequest {
             connection.setRequestProperty("X-PAYPAL-REQUEST-DATA-FORMAT", "NV");
             connection.setRequestProperty("X-PAYPAL-RESPONSE-DATA-FORMAT", "NV");
             connection.setRequestProperty("X-PAYPAL-APPLICATION-ID", credentialObj.getAppId());
+            connection.setRequestProperty("X-PAYPAL-REQUEST-SOURCE", "GAE-JAVA_Toolkit");
             
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(postParameters.toString());
