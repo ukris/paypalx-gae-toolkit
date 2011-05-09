@@ -1,6 +1,10 @@
 
 package com.paypal.adaptive.core;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.util.HashMap;
 
 /**
@@ -17,7 +21,7 @@ public class BaseAddress  {
     protected String countryCode;
     protected String type;
 
-    public BaseAddress(HashMap<String, String> params, int index){
+    public BaseAddress(HashMap<String, String> params, String prefix){
 		
     	/*
     	 * &addressList.address(0).addresseeName=&
@@ -27,26 +31,26 @@ public class BaseAddress  {
 	 * addressList.address(0).baseAddress.type=BILLING
     	 */
     	
-		if(params.containsKey("addressList.address("+ index +").baseAddress.line1")){
-			this.line1 = params.get("addressList.address("+ index +").baseAddress.line1");
+		if(params.containsKey( prefix + ".baseAddress.line1")){
+			this.line1 = params.get( prefix + ".baseAddress.line1");
 		}
-		if(params.containsKey("addressList.address("+ index +").baseAddress.line2")){
-			this.line2 = params.get("addressList.address("+ index +").baseAddress.line2");
+		if(params.containsKey( prefix + ".baseAddress.line2")){
+			this.line2 = params.get( prefix + ".baseAddress.line2");
 		}
-		if(params.containsKey("addressList.address("+ index +").baseAddress.city")){
-			this.city = params.get("addressList.address("+ index +").baseAddress.city");
+		if(params.containsKey( prefix + ".baseAddress.city")){
+			this.city = params.get( prefix + ".baseAddress.city");
 		}
-		if(params.containsKey("addressList.address("+ index +").baseAddress.state")){
-			this.state = params.get("addressList.address("+ index +").baseAddress.state");
+		if(params.containsKey( prefix + ".baseAddress.state")){
+			this.state = params.get( prefix + ".baseAddress.state");
 		}
-		if(params.containsKey("addressList.address("+ index +").baseAddress.postalCode")){
-			this.postalCode = params.get("addressList.address("+ index +").baseAddress.postalCode");
+		if(params.containsKey( prefix + ".baseAddress.postalCode")){
+			this.postalCode = params.get( prefix + ".baseAddress.postalCode");
 		}
-		if(params.containsKey("addressList.address("+ index +").baseAddress.countryCode")){
-			this.countryCode = params.get("addressList.address("+ index +").baseAddress.countryCode");
+		if(params.containsKey( prefix + ".baseAddress.countryCode")){
+			this.countryCode = params.get( prefix + ".baseAddress.countryCode");
 		}
-		if(params.containsKey("addressList.address("+ index +").baseAddress.type")){
-			this.type = params.get("addressList.address("+ index +").baseAddress.type");
+		if(params.containsKey( prefix + ".baseAddress.type")){
+			this.type = params.get( prefix + ".baseAddress.type");
 		}
 	}
 
@@ -218,5 +222,50 @@ public class BaseAddress  {
     public void setType(String value) {
         this.type = value;
     }
+
+public String toString(){
+		
+		StringBuilder outStr = new StringBuilder();
+		
+		outStr.append("<table>");
+		outStr.append("<tr><th>");
+		outStr.append(this.getClass().getSimpleName());
+		outStr.append("</th><td></td></tr>");
+		BeanInfo info;
+		try {
+			info = Introspector.getBeanInfo( this.getClass(), Object.class );
+			for ( PropertyDescriptor pd : info.getPropertyDescriptors() ) {
+				try {
+					String name = pd.getName();
+					Object value = this.getClass().getDeclaredField(name).get(this);
+					if(value != null) {
+						outStr.append("<tr><td>");
+						outStr.append(pd.getName());
+						outStr.append("</td><td>");
+						outStr.append(value.toString());
+					}
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoSuchFieldException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				outStr.append("</td></tr>");
+			}
+	    } catch (IntrospectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outStr.append("</table>");
+		return outStr.toString(); 
+		
+	}
 
 }

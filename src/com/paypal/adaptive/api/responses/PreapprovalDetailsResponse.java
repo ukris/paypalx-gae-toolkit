@@ -1,10 +1,13 @@
 
 package com.paypal.adaptive.api.responses;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.paypal.adaptive.core.Address;
 import com.paypal.adaptive.core.PayError;
 import com.paypal.adaptive.core.PreapprovalDetails;
 import com.paypal.adaptive.core.ResponseEnvelope;
@@ -18,8 +21,7 @@ public class PreapprovalDetailsResponse {
 
     protected ResponseEnvelope responseEnvelope;
     protected PreapprovalDetails preapprovalDetails;
-    protected ArrayList<Address> addressList;
-	protected ArrayList<PayError> payErrorList;
+    protected ArrayList<PayError> payErrorList;
 
     
     public ArrayList<PayError> getPayErrorList() {
@@ -51,21 +53,6 @@ public class PreapprovalDetailsResponse {
 		this.preapprovalDetails = preapprovalDetails;
 	}
 
-
-	public ArrayList<Address> getAddressList() {
-		return addressList;
-	}
-
-
-	public void setAddressList(ArrayList<Address> addressList) {
-		this.addressList = addressList;
-	}
-
-	public void addToAddressList(Address address) {
-		if(this.addressList == null)
-			this.addressList = new ArrayList<Address>();
-		this.addressList.add(address);
-	}
 
 	/*responseEnvelope.timestamp=2010-03-26T12%3A01%3A54.779-07%3A00&responseEnvelope.ack=Success&
 	 * responseEnvelope.correlationId=da19364ca27ac&responseEnvelope.build=1238639&approved=true&
@@ -105,15 +92,50 @@ public class PreapprovalDetailsResponse {
     		}
     	}
     	
-    	
-    	for(int i = 0; i < 10; i++){
-    		if(preapprovalDetailsResponseParams.containsKey("addressList.address("+ i +").addresseeName")) {
-	    		Address addr = new Address(preapprovalDetailsResponseParams, i);
-	    		this.addToAddressList(addr);
-    		} else
-    			break;
-    	}
-    	
     }
 
+public String toString(){
+		
+		StringBuilder outStr = new StringBuilder();
+		
+		outStr.append("<table border=1>");
+		outStr.append("<tr><th>");
+		outStr.append(this.getClass().getSimpleName());
+		outStr.append("</th><td></td></tr>");
+		BeanInfo info;
+		try {
+			info = Introspector.getBeanInfo( this.getClass(), Object.class );
+			for ( PropertyDescriptor pd : info.getPropertyDescriptors() ) {
+				try {
+					String name = pd.getName();
+					Object value = this.getClass().getDeclaredField(name).get(this);
+					if(value != null) {
+						outStr.append("<tr><td>");
+						outStr.append(pd.getName());
+						outStr.append("</td><td>");
+						outStr.append(value.toString());
+					}
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoSuchFieldException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				outStr.append("</td></tr>");
+			}
+	    } catch (IntrospectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outStr.append("</table>");
+		return outStr.toString(); 
+		
+	}
 }

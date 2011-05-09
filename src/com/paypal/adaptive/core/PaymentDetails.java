@@ -3,6 +3,10 @@
  */
 package com.paypal.adaptive.core;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +27,7 @@ public class PaymentDetails {
     protected ArrayList<PaymentInfo> paymentInfoList;
     protected String returnUrl;
     protected String senderEmail;
+    protected SenderIdentifier sender;
     protected String status;
     protected String trackingId;
     protected String payKey;
@@ -216,8 +221,12 @@ public class PaymentDetails {
     	// add actionType
     	postParameters.append(ParameterUtils.createUrlParameter("actionType", actionType.toString()));
     	postParameters.append(ParameterUtils.PARAM_SEP);
-    	// add senderEmail if set
-    	if(this.senderEmail != null) {
+    	
+    	// add sender or senderEmail - sender get's first preference
+    	if(this.sender != null && this.sender.getEmail() != null){
+   			postParameters.append(this.sender.serialize());
+       		postParameters.append(ParameterUtils.PARAM_SEP);  
+    	} else if(this.senderEmail != null) {
     		postParameters.append(ParameterUtils.createUrlParameter("senderEmail", this.senderEmail));
     		postParameters.append(ParameterUtils.PARAM_SEP);        	
     	}
@@ -307,12 +316,27 @@ public class PaymentDetails {
 			this.payKey = payDetailsResponseParams.get("payKey");
 		if(payDetailsResponseParams.containsKey("senderEmail"))
 			this.senderEmail = payDetailsResponseParams.get("senderEmail");
+		if(payDetailsResponseParams.containsKey("sender.email") 
+				|| payDetailsResponseParams.containsKey("sender.phone.phoneNumber"))
+			this.sender = new SenderIdentifier(payDetailsResponseParams);
 		if(payDetailsResponseParams.containsKey("reverseAllParallelPaymentsOnError"))
 			this.reverseAllParallelPaymentsOnError = Boolean.parseBoolean(payDetailsResponseParams.get("reverseAllParallelPaymentsOnError"));
 		if(payDetailsResponseParams.containsKey("feesPayer"))
 			this.feesPayer = FeesPayerType.valueOf(payDetailsResponseParams.get("feesPayer"));
 		if(payDetailsResponseParams.containsKey("currencyCode"))
 			this.currencyCode = CurrencyCodes.valueOf(payDetailsResponseParams.get("currencyCode"));
+		if(payDetailsResponseParams.containsKey("trackingId"))
+			this.trackingId = payDetailsResponseParams.get("trackingId");
+		
+		// load up funding Constraints
+		for(int i = 0; i < 3; i++){
+			if(payDetailsResponseParams.containsKey("fundingConstraint.allowedFundingType.fundingTypeInfo(" + i + ").fundingType")){
+				this.addToFundingConstraintList(new FundingConstraint(payDetailsResponseParams, i));
+			} else {
+				break;
+			}
+		}
+		
 		for(int i=0; i< 10; i++){
 			
 			if( payDetailsResponseParams.containsKey("paymentInfoList.paymentInfo(" + i +").receiver.amount")
@@ -366,6 +390,65 @@ public class PaymentDetails {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * @return the sender
+	 */
+	public SenderIdentifier getSender() {
+		return sender;
+	}
+
+	/**
+	 * @param sender the sender to set
+	 */
+	public void setSender(SenderIdentifier sender) {
+		this.sender = sender;
+	}
+	
+	public String toString(){
+		
+		StringBuilder outStr = new StringBuilder();
+		
+		outStr.append("<table>");
+		outStr.append("<tr><th>");
+		outStr.append(this.getClass().getSimpleName());
+		outStr.append("</th><td></td></tr>");
+		BeanInfo info;
+		try {
+			info = Introspector.getBeanInfo( this.getClass(), Object.class );
+			for ( PropertyDescriptor pd : info.getPropertyDescriptors() ) {
+				try {
+					String name = pd.getName();
+					Object value = this.getClass().getDeclaredField(name).get(this);
+					if(value != null) {
+						outStr.append("<tr><td>");
+						outStr.append(pd.getName());
+						outStr.append("</td><td>");
+						outStr.append(value.toString());
+					}
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoSuchFieldException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				outStr.append("</td></tr>");
+			}
+	    } catch (IntrospectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outStr.append("</table>");
+		return outStr.toString(); 
+		
 	}
    
 }

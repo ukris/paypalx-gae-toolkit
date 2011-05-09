@@ -4,6 +4,10 @@
 package com.paypal.adaptive.core;
 
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.util.HashMap;
 
 /**
@@ -91,10 +95,10 @@ public class ResponseEnvelope {
 		return ack;
 	}
 	
-	/*
-	public String toString(){
+	
+public String toString(){
 		
-StringBuilder outStr = new StringBuilder();
+		StringBuilder outStr = new StringBuilder();
 		
 		outStr.append("<table>");
 		outStr.append("<tr><th>");
@@ -104,11 +108,15 @@ StringBuilder outStr = new StringBuilder();
 		try {
 			info = Introspector.getBeanInfo( this.getClass(), Object.class );
 			for ( PropertyDescriptor pd : info.getPropertyDescriptors() ) {
-				outStr.append("<tr><td>");
-				outStr.append(pd.getName());
-				outStr.append("</td><td>");
 				try {
-					outStr.append(this.getClass().getDeclaredField(pd.getName()).get(this));
+					String name = pd.getName();
+					Object value = this.getClass().getDeclaredField(name).get(this);
+					if(value != null) {
+						outStr.append("<tr><td>");
+						outStr.append(pd.getName());
+						outStr.append("</td><td>");
+						outStr.append(value.toString());
+					}
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -132,5 +140,5 @@ StringBuilder outStr = new StringBuilder();
 		return outStr.toString(); 
 		
 	}
-	*/
+	
 }

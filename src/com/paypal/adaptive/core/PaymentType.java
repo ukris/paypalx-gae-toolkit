@@ -9,5 +9,6 @@ public enum PaymentType {
 	GOODS,
 	SERVICE,
 	PERSONAL,
-	CASHADVANCE;
+	CASHADVANCE,
+	DIGITALGOODS;
 }
