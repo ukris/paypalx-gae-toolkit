@@ -1,6 +1,10 @@
 
 package com.paypal.adaptive.api.responses;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -21,8 +25,7 @@ public class PreapprovalResponse {
 	protected String preapprovalKey;
 	protected ArrayList<PayError> errorList;
     
-    public PreapprovalResponse(String responseString)
-    throws PayPalErrorException, AuthorizationRequiredException{
+    public PreapprovalResponse(String responseString){
     	
     	payResponseParams = new HashMap<String, String>();
     	// parse the string and load into the object
@@ -49,19 +52,6 @@ public class PreapprovalResponse {
     		}
     	}
     	
-    	// if there is an API level error handle those first - look for responseEnvelope/ack
-    	if(responseEnvelope.getAck() == AckCode.Failure
-    		|| responseEnvelope.getAck() == AckCode.FailureWithWarning){
-    		// throw error
-    		throw new PayPalErrorException(responseEnvelope, errorList);
-    	}
-    	if(responseEnvelope.getAck() == AckCode.Success
-    			|| responseEnvelope.getAck() == AckCode.SuccessWithWarning){
-    		// throw exception to redirect user for authorization
-			AuthorizationRequiredException ex = new AuthorizationRequiredException();
-			ex.setPreapprovalKey(preapprovalKey);
-			throw ex;
-    	}
     }
 	/**
 	 * @param responseEnvelope the responseEnvelope to set
@@ -106,7 +96,50 @@ public class PreapprovalResponse {
 		this.preapprovalKey = preapprovalKey;
 	}
     
-
+public String toString(){
+		
+		StringBuilder outStr = new StringBuilder();
+		
+		outStr.append("<table border=1>");
+		outStr.append("<tr><th>");
+		outStr.append(this.getClass().getSimpleName());
+		outStr.append("</th><td></td></tr>");
+		BeanInfo info;
+		try {
+			info = Introspector.getBeanInfo( this.getClass(), Object.class );
+			for ( PropertyDescriptor pd : info.getPropertyDescriptors() ) {
+				try {
+					String name = pd.getName();
+					Object value = this.getClass().getDeclaredField(name).get(this);
+					if(value != null) {
+						outStr.append("<tr><td>");
+						outStr.append(pd.getName());
+						outStr.append("</td><td>");
+						outStr.append(value.toString());
+					}
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoSuchFieldException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				outStr.append("</td></tr>");
+			}
+	    } catch (IntrospectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outStr.append("</table>");
+		return outStr.toString(); 
+		
+	}
 
 
 }

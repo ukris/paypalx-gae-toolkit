@@ -6,5 +6,6 @@ package com.paypal.adaptive.core;
 public enum ActionType {
 
 	PAY,
-	CREATE;
+	CREATE,
+	PAY_PRIMARY;
 }

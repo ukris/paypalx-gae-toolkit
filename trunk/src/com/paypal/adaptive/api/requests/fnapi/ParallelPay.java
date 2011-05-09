@@ -12,10 +12,12 @@ import java.util.List;
 import com.paypal.adaptive.api.requests.PayRequest;
 import com.paypal.adaptive.api.responses.PayResponse;
 import com.paypal.adaptive.core.APICredential;
+import com.paypal.adaptive.core.AckCode;
 import com.paypal.adaptive.core.ActionType;
 import com.paypal.adaptive.core.ClientDetails;
 import com.paypal.adaptive.core.CurrencyCodes;
 import com.paypal.adaptive.core.PaymentDetails;
+import com.paypal.adaptive.core.PaymentExecStatus;
 import com.paypal.adaptive.core.Receiver;
 import com.paypal.adaptive.core.ServiceEnvironment;
 import com.paypal.adaptive.exceptions.AuthorizationRequiredException;
@@ -134,6 +136,47 @@ public class ParallelPay {
 		// set payment details
 		payRequest.setPaymentDetails(paymentDetails);
 		PayResponse payResp = payRequest.execute(credentialObj);
+		 // if there is an API level error handle those first - look for responseEnvelope/ack
+        if(payResp.getResponseEnvelope().getAck() == AckCode.Failure
+                || payResp.getResponseEnvelope().getAck() == AckCode.FailureWithWarning){
+                // throw error
+                throw new PayPalErrorException(payResp.getResponseEnvelope(), payResp.getPayErrorList());
+        }
+
+        // if it's a payment execution error throw an exception
+        if(payResp.getPaymentExecStatus() != null){
+                if(payResp.getPaymentExecStatus() == PaymentExecStatus.ERROR ) {
+
+                        PaymentExecException peex = new PaymentExecException(payResp.getPaymentExecStatus());
+                        peex.setPayErrorList(payResp.getPayErrorList());
+                        peex.setResponseEnvelope(payResp.getResponseEnvelope());
+                        throw peex;
+
+                } else if( payResp.getPaymentExecStatus() == PaymentExecStatus.INCOMPLETE
+                                || payResp.getPaymentExecStatus() == PaymentExecStatus.REVERSALERROR ){
+                        PaymentInCompleteException ex = new PaymentInCompleteException(payResp.getPaymentExecStatus());
+                        ex.setPayErrorList(payResp.getPayErrorList());
+                        ex.setPayKey(payResp.getPayKey());
+                        ex.setResponseEnvelope(payResp.getResponseEnvelope());
+                        throw ex;
+
+                } else if(payResp.getPaymentExecStatus() == PaymentExecStatus.CREATED){
+                        // throw exception to redirect user for authorization
+                        AuthorizationRequiredException ex = new AuthorizationRequiredException();
+                        ex.setPayKey(payResp.getPayKey());
+                        throw ex;
+                } else if(payResp.getPaymentExecStatus() == PaymentExecStatus.COMPLETED
+                                || payResp.getPaymentExecStatus() == PaymentExecStatus.PROCESSING
+                                || payResp.getPaymentExecStatus() == PaymentExecStatus.PENDING){
+                        // no further action required so treat these as success
+                } else {
+                        // unknown paymentExecStatus - throw exception
+                        PaymentExecException peex = new PaymentExecException(payResp.getPaymentExecStatus());
+                        peex.setPayErrorList(payResp.getPayErrorList());
+                        peex.setResponseEnvelope(payResp.getResponseEnvelope());
+                        throw peex;
+                }
+        }
 		return payResp;
 	}
 	
