@@ -785,10 +785,7 @@ public class AdaptiveRequests {
 					+ " than sum of the amounts received by the secondary receivers (" + e.getSumOfSecondaryReceiversAmount()
 					+ ")");
 
-		} catch (AuthorizationRequiredException e) {
-			// redirect the user to PayPal for Authorization
-			resp.sendRedirect(e.getAuthorizationUrl(ServiceEnvironment.SANDBOX));
-		}
+		} 
 
 		resp.getWriter().println("</body></html>");
 		
