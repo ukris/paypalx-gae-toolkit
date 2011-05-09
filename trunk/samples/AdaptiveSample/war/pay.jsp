@@ -12,7 +12,7 @@
 <br/>
 
 <form method="POST">
-<input type="hidden" name="action" value="currencyConversion"/>
+<input type="hidden" name="action" value="pay"/>
 <center>
 <table class="api">
 <tr>
@@ -48,6 +48,11 @@
 	<tr>
 		<td class="thinfield">Preapproval Key:</td>
 		<td><input type="text" size="50" maxlength="32" name="preapprovalKey"
+			value="" /></td>
+	</tr>
+	<tr>
+		<td class="thinfield">Memo:</td>
+		<td><input type="text" size="50" maxlength="32" name="memo"
 			value="" /></td>
 	</tr>
 	<TR>

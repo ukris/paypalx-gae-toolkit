@@ -56,7 +56,7 @@ public class CancelPreapprovalResponse {
     	}
 
     	responseEnvelope = new ResponseEnvelope(preapprovalDetailsResponseParams);
-    	    	
+    	payErrorList = new ArrayList<PayError>();
     	// we will parse 10 errors for now
     	for(int i = 0; i < 10; i++){
     		if(preapprovalDetailsResponseParams.containsKey("error(" + i +").errorId")){
