@@ -19,9 +19,19 @@
 		<td colspan="6" class="header">Adaptive Payments - Pay</td>
 	</tr>
 	<tr>
+		<td class="thinfield">ActionType:</td>
+		<td>
+			<select name="actionType">
+				<option value="PAY">PAY</option>
+				<option value="CREATE">CREATE</option>
+				<option value="PAY_PRIMARY">PAY_PRIMARY</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
 		<td class="thinfield">Sender's Email:</td>
 		<td><input type="text" size="50" maxlength="32" name="email"
-			value="ppalav_1260941775_per@yahoo.com" /></td>
+			value="" /></td>
 	</tr>
 
 	<tr>
@@ -57,7 +67,7 @@
 		<P align="right">1</P>
 		</td>
 		<td><input type="text" name="receiveremail" size="50"
-			value="pd_1265515509_biz@yahoo.com"></td>
+			value="ppalavilli@yahoo.com"></td>
 		<td><input type="text" name="amount" 
 			value="1.0"></td>
 		<td><input type="text" name="primary"  
@@ -68,15 +78,15 @@
 		<P align="right">2</P>
 		</td>		
 		<td><input type="text" name="receiveremail" size="50"
-			value="pp+sel_1261964325_biz@yahoo.com"></td>
+			value=""></td>
 		<td><input type="text" name="amount" 
-			value="9.0"></td>
+			value=""></td>
 		<td><input type="text" name="primary"  
-			value="true"></td>		
+			value=""></td>		
 	</tr>
 	<tr>
 		<td class="thinfield" width="52"></td>
-		<td colspan="5"><input type="submit" value="Submit"></td>
+		<td><input id="std_pay_button" type="submit" value="Submit"></td>
 	</tr>
 </table>
 </center>
