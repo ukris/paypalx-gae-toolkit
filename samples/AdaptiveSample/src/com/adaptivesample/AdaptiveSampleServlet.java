@@ -9,21 +9,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.paypal.adaptive.api.responses.CancelPreapprovalResponse;
-import com.paypal.adaptive.api.responses.ConvertCurrencyResponse;
-import com.paypal.adaptive.api.responses.PaymentDetailsResponse;
-import com.paypal.adaptive.api.responses.PreapprovalDetailsResponse;
-import com.paypal.adaptive.api.responses.PreapprovalResponse;
-import com.paypal.adaptive.api.responses.RefundResponse;
 import com.paypal.adaptive.core.APICredential;
-import com.paypal.adaptive.core.AckCode;
 import com.paypal.adaptive.core.ServiceEnvironment;
-
 
 @SuppressWarnings("serial")
 public class AdaptiveSampleServlet extends HttpServlet {
-	private static final Logger log = Logger.getLogger(AdaptiveSampleServlet.class.getName());
-
+	private static final Logger log = Logger
+			.getLogger(AdaptiveSampleServlet.class.getName());
 
 	private static APICredential credentialObj;
 
@@ -33,16 +25,22 @@ public class AdaptiveSampleServlet extends HttpServlet {
 		super.init(config);
 
 		// Get the value of APIUsername
-		String APIUsername = getServletConfig().getInitParameter("PPAPIUsername"); 
-		String APIPassword = getServletConfig().getInitParameter("PPAPIPassword"); 
-		String APISignature = getServletConfig().getInitParameter("PPAPISignature"); 
-		String AppID = getServletConfig().getInitParameter("PPAppID"); 
-		String AccountEmail = getServletConfig().getInitParameter("PPAccountEmail");
+		String APIUsername = getServletConfig().getInitParameter(
+				"PPAPIUsername");
+		String APIPassword = getServletConfig().getInitParameter(
+				"PPAPIPassword");
+		String APISignature = getServletConfig().getInitParameter(
+				"PPAPISignature");
+		String AppID = getServletConfig().getInitParameter("PPAppID");
+		String AccountEmail = getServletConfig().getInitParameter(
+				"PPAccountEmail");
+		String PPEnvironment = getServletConfig().getInitParameter(
+				"PPEnvironment");
 
-		if(APIUsername == null || APIUsername.length() <= 0
-				|| APIPassword == null || APIPassword.length() <=0 
+		if (APIUsername == null || APIUsername.length() <= 0
+				|| APIPassword == null || APIPassword.length() <= 0
 				|| APISignature == null || APISignature.length() <= 0
-				|| AppID == null || AppID.length() <=0 ) {
+				|| AppID == null || AppID.length() <= 0) {
 			// requires API Credentials not set - throw exception
 			throw new ServletException("APICredential(s) missing");
 		}
@@ -53,76 +51,109 @@ public class AdaptiveSampleServlet extends HttpServlet {
 		credentialObj.setSignature(APISignature);
 		credentialObj.setAppId(AppID);
 		credentialObj.setAccountEmail(AccountEmail);
+		if (PPEnvironment != null) {
+			if (PPEnvironment.equals("BETA_SANDBOX")) {
+				AdaptiveRequests.PPEnv = ServiceEnvironment.BETA_SANDBOX;
+			} else if (PPEnvironment.equals("PRODUCTION")) {
+				AdaptiveRequests.PPEnv = ServiceEnvironment.PRODUCTION;
+			} else if (PPEnvironment.equals("SANDBOX")) {
+				AdaptiveRequests.PPEnv = ServiceEnvironment.SANDBOX;
+			} else if (PPEnvironment.equals("STAGING")) {
+				AdaptiveRequests.PPEnv = ServiceEnvironment.STAGING;
+			} else {
+				AdaptiveRequests.PPEnv = ServiceEnvironment.SANDBOX;
+			}
+		}
 		log.info("Servlet initialized successfully");
 	}
 
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-	throws IOException {
+			throws IOException {
 		String action = req.getParameter("action");
-		String returnParam = req.getParameter("return"); 
-		String cancel = req.getParameter("cancel");
+
 		try {
-			
-			log.info("Received Action: " + action );
 
-			if(cancel != null && cancel.equals("1")) {
-				// user canceled the payment
-			} 
+			log.info("Received Action: " + action);
 
-			if(returnParam != null && returnParam.equals("1")){
-				// user returned from PayPal AuthZ url
-				resp.setContentType("text/html");
-				
-				if(action != null && action.equals("pay")){
-					resp.getWriter().println("<html><head><title>Payment status</title></head><body>");
-					resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
-					String payKey = req.getParameter("payKey");
-					PaymentDetailsResponse payDetailsResp = 
-						AdaptiveRequests.processPaymentDetails(resp, payKey, null, null, credentialObj);
-					resp.getWriter().println( payDetailsResp.getPaymentDetails().getStatus());
-				} else if(action != null && action.equals("preapproval")){
-					resp.getWriter().println("<html><head><title>Preapproval status</title></head><body>");
-					resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
-					String preapprovalKey = req.getParameter("preapprovalKey");
-					PreapprovalDetailsResponse preapprovalDetailsResp = 						 
-						AdaptiveRequests.processPreapprovalDetails(resp, preapprovalKey, true, credentialObj);
-					resp.getWriter().println( preapprovalDetailsResp.getPreapprovalDetails().getStatus());
-				}
-				resp.getWriter().println("</body></html>");
-			} else { 
-				if (action != null && action.equals("pay")) {
+			if (action != null && action.equals("pay")) {
 
-					getServletConfig().getServletContext().getRequestDispatcher(
-					"/pay.jsp").forward(req, resp);
-				} else if (action != null && action.equals("preapproval")) {
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/pay.jsp").forward(req, resp);
+			} else if (action != null && action.equals("paymentSuccess")) {
 
-					getServletConfig().getServletContext().getRequestDispatcher(
-					"/preapproval.jsp").forward(req, resp);
-				} else if (action != null && action.equals("refund")) {
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/paymentsuccess.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("paymentCancel")) {
 
-					getServletConfig().getServletContext().getRequestDispatcher(
-					"/refund.jsp").forward(req, resp);
-				} else if (action != null && action.equals("payDetails")) {
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/paymentcancel.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("executePayment")) {
 
-					getServletConfig().getServletContext().getRequestDispatcher(
-					"/payDetails.jsp").forward(req, resp);
-				} else if (action != null && action.equals("preapprovalDetails")) {
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/executePayment.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("preapproval")) {
 
-					getServletConfig().getServletContext().getRequestDispatcher(
-					"/preapprovalDetails.jsp").forward(req, resp);	
-				} else if (action != null && action.equals("cancelPreapproval")) {
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/preapproval.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("refund")) {
 
-					getServletConfig().getServletContext().getRequestDispatcher(
-					"/cancelPreapproval.jsp").forward(req, resp);	
-				} else if (action != null && action.equals("currencyConversion")) {
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/refund.jsp").forward(req, resp);
+			} else if (action != null && action.equals("payDetails")) {
 
-					getServletConfig().getServletContext().getRequestDispatcher(
-					"/convertCurrency.jsp").forward(req, resp);
-				
+				if (req.getParameter("payKey") != null) {
+					doPost(req, resp);
 				} else {
-					getServletConfig().getServletContext().getRequestDispatcher(
-					"/index.jsp").forward(req, resp);
+					getServletConfig().getServletContext()
+							.getRequestDispatcher("/payDetails.jsp")
+							.forward(req, resp);
 				}
+			} else if (action != null && action.equals("preapprovalDetails")) {
+
+				if (req.getParameter("preapprovalKey") != null) {
+					doPost(req, resp);
+				} else {
+					getServletConfig().getServletContext()
+							.getRequestDispatcher("/preapprovalDetails.jsp")
+							.forward(req, resp);
+				}
+			} else if (action != null && action.equals("cancelPreapproval")) {
+
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/cancelPreapproval.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("currencyConversion")) {
+
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/convertCurrency.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("setPaymentOptions")) {
+
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/setPaymentOptions.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("getPaymentOptions")) {
+
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/getPaymentOptions.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("getFundingPlans")) {
+
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/getFundingPlans.jsp")
+						.forward(req, resp);
+			} else if (action != null && action.equals("getShippingAddresses")) {
+
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/getShippingAddresses.jsp")
+						.forward(req, resp);
+			} else {
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/index.jsp").forward(req, resp);
 			}
 
 		} catch (ServletException e) {
@@ -136,133 +167,97 @@ public class AdaptiveSampleServlet extends HttpServlet {
 	}
 
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-	throws IOException {
-
+			throws IOException, ServletException {
 
 		String action = req.getParameter("action");
 
 		if (action != null && action.equals("pay")) {
-						
-			AdaptiveRequests.processPayRequest(req, resp, credentialObj);
-			
+
+			AdaptiveRequests.processPayRequest(getServletConfig()
+					.getServletContext(), req, resp, credentialObj);
+
 		} else if (action != null && action.equals("payDetails")) {
-			resp.setContentType("text/html");
-			resp.getWriter().println("<html><head><title>Preapproval Details</title></head><body>");
-			resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 
 			String payKey = req.getParameter("payKey");
-			if(payKey != null){
-				PaymentDetailsResponse payDetailsResp = 
-					AdaptiveRequests.processPaymentDetails(resp, payKey, null, null, credentialObj);
+			if (payKey != null) {
+				AdaptiveRequests.processPaymentDetails(resp, payKey, null,
+						null, credentialObj);
 
-				resp.getWriter().println( payDetailsResp.getPaymentDetails().getStatus());
-
-			}  else {
-				resp.getWriter().println("PayDetails Failed");
+			} else {
+				resp.getWriter().println("Required field payKey not provided.");
 			}
 
-			resp.getWriter().println("</body></html>");
+		} else if (action != null && action.equals("executePayment")) {
+
+			String payKey = req.getParameter("payKey");
+			if (payKey != null) {
+				AdaptiveRequests.processExecutePaymentRequest(resp, payKey,
+						null, null, credentialObj);
+
+			} else {
+				resp.getWriter().println("ExecurePayment Failed");
+			}
+
 		} else if (action != null && action.equals("preapproval")) {
-			resp.setContentType("text/html");
-			resp.getWriter().println("<html><head><title>Preapproval Response & Preapproval Details</title></head><body>");
-			resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 
-			PreapprovalResponse preapprovalResp = AdaptiveRequests.processPreapprovalRequest(req, resp, credentialObj);
-			resp.getWriter().println( preapprovalResp.toString());
+			AdaptiveRequests
+					.processPreapprovalRequest(req, resp, credentialObj);
 
-			// session.setAttribute("payResponseRef", payResp);
-			if(preapprovalResp != null) {
-				if(preapprovalResp.getErrorList() != null && preapprovalResp.getErrorList().size() > 0) {
-					// error occured
+		} else if (action != null && action.equals("setPaymentOptions")) {
 
-				} else {
+			AdaptiveRequests.processSetPaymentOptionsRequest(req, resp,
+					credentialObj);
 
-					PreapprovalDetailsResponse payDetailsResp = 
-						AdaptiveRequests.processPreapprovalDetails(resp, preapprovalResp.getPreapprovalKey(), true, credentialObj);
+		} else if (action != null && action.equals("getPaymentOptions")) {
 
-					resp.getWriter().println( payDetailsResp.toString());
+			AdaptiveRequests.processGetPaymentOptionsRequest(req, resp,
+					credentialObj);
 
+		} else if (action != null && action.equals("getFundingPlans")) {
 
-					// generate authurization url
-					if (preapprovalResp.getResponseEnvelope().getAck() == AckCode.Success) {
+			AdaptiveRequests.processGetFundingPlansRequest(req, resp,
+					credentialObj);
 
-						resp.getWriter().println("Preapproval Success.");
-					
-						resp.getWriter().println("<a href=\""
-								+ AdaptiveRequests.generatePreApprovalAuthorizeUrl(preapprovalResp.getPreapprovalKey(), ServiceEnvironment.SANDBOX)
-								+ "\">Click here to authorize</a>");
-					}
+		} else if (action != null && action.equals("getShippingAddresses")) {
+			AdaptiveRequests.processGetShippingAddressesRequest(req, resp,
+					credentialObj);
 
-
-				}
-			}  else {
-				resp.getWriter().println("Preapproval Failed");
-			}
-
-			resp.getWriter().println("</body></html>");
 		} else if (action != null && action.equals("preapprovalDetails")) {
-			resp.setContentType("text/html");
-			resp.getWriter().println("<html><head><title>Preapproval Details</title></head><body>");
-			resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 
 			String preapprovalKey = req.getParameter("preapprovalKey");
-			if(preapprovalKey != null){
-					PreapprovalDetailsResponse payDetailsResp = 
-						AdaptiveRequests.processPreapprovalDetails(resp, preapprovalKey, true, credentialObj);
+			if (preapprovalKey != null) {
+				AdaptiveRequests.processPreapprovalDetails(resp,
+						preapprovalKey, true, credentialObj);
 
-					resp.getWriter().println( payDetailsResp.getPreapprovalDetails().getStatus());
-
-			}  else {
-				resp.getWriter().println("PreapprovalDetails Failed");
+			} else {
+				resp.getWriter().println(
+						"PreapprovalDetails - no approvalKey provided");
 			}
 
-			resp.getWriter().println("</body></html>");
 		} else if (action != null && action.equals("cancelPreapproval")) {
-			resp.setContentType("text/html");
-			resp.getWriter().println("<html><head><title>Cancel Preapproval</title></head><body>");
-			resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 
 			String preapprovalKey = req.getParameter("preapprovalKey");
-			if(preapprovalKey != null){
-				CancelPreapprovalResponse cancelPreapprovalResp = 
-						AdaptiveRequests.processCancelPreapproval(resp, preapprovalKey, credentialObj);
+			if (preapprovalKey != null) {
+				AdaptiveRequests.processCancelPreapproval(resp, preapprovalKey,
+						credentialObj);
 
-					resp.getWriter().println( cancelPreapprovalResp.toString());
-
-			}  else {
+			} else {
 				resp.getWriter().println("PreapprovalDetails Failed");
 			}
 
-			resp.getWriter().println("</body></html>");
 		} else if (action != null && action.equals("refund")) {
-			resp.setContentType("text/html");
-			resp.getWriter().println("<html><head><title>Refund</title></head><body>");
-			resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 
-			RefundResponse refundResp = 
-					AdaptiveRequests.processRefund(req, resp, credentialObj);
+			AdaptiveRequests.processRefund(req, resp, credentialObj);
 
-			resp.getWriter().println( refundResp.toString());
-
-
-			resp.getWriter().println("</body></html>");
 		} else if (action != null && action.equals("currencyConversion")) {
-			resp.setContentType("text/html");
-			resp.getWriter().println("<html><head><title>Convert Currency</title></head><body>");
-			resp.getWriter().println("<a href=\"/adaptivesample\">Home</a> <br/>");
 
-			ConvertCurrencyResponse currConvertResp = 
-					AdaptiveRequests.processCurrencyConversion(req, resp, credentialObj);
+			AdaptiveRequests
+					.processCurrencyConversion(req, resp, credentialObj);
 
-			resp.getWriter().println( currConvertResp.toString());
-
-
-			resp.getWriter().println("</body></html>");
-		
 		} else {
 			try {
-				getServletConfig().getServletContext().getRequestDispatcher(
-						"/index.jsp").forward(req, resp);
+				getServletConfig().getServletContext()
+						.getRequestDispatcher("/index.jsp").forward(req, resp);
 
 			} catch (ServletException e) {
 				// TODO Auto-generated catch block
@@ -273,6 +268,5 @@ public class AdaptiveSampleServlet extends HttpServlet {
 			}
 		}
 
-		
 	}
 }

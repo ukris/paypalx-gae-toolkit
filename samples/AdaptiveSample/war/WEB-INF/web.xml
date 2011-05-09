@@ -28,7 +28,33 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 			<param-name>PPAccountEmail</param-name>  
 			<param-value>pd_1265515509_biz@yahoo.com</param-value>  
 		</init-param>
-
+	
+	<!-- 
+	<init-param>  
+			<param-name>PPAPIUsername</param-name>  
+			<param-value>ppalavilli_api1.yahoo.com</param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>PPAPIPassword</param-name>  
+			<param-value>WBGGAZ6Q3MWLBWYM</param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>PPAPISignature</param-name>  
+			<param-value>AYgonFny6cb4iAs78aXmrsqOGaBEA8D7OYujCHcj4YiwS6fo - -5tDe3V</param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>PPAppID</param-name>  
+			<param-value>APP-0WT23059P9235501X</param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>PPAccountEmail</param-name>  
+			<param-value>ppalavilli@yahoo.com</param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>PPEnvironment</param-name>  
+			<param-value>PRODUCTION</param-value>  
+		</init-param>
+		 -->
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AdaptiveSample</servlet-name>
