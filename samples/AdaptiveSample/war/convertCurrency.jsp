@@ -12,7 +12,7 @@
 <br/>
 
 <form method="POST">
-<input type="hidden" name="action" value="pay"/>
+<input type="hidden" name="action" value="currencyConversion"/>
 <center>
 <table class="api">
 	<tr>

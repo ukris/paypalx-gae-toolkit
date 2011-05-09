@@ -121,6 +121,10 @@ public class AdaptiveRequests {
 			if (pkey != null && pkey.length() >= 20) {
 				paymentDetails.setPreapprovalKey(pkey);
 			}
+			String memo = req.getParameter("memo");
+			if(memo != null & memo.length() > 0) {
+				paymentDetails.setMemo(memo);
+			}
 			
 			payRequest.setPaymentDetails(paymentDetails);
 			
