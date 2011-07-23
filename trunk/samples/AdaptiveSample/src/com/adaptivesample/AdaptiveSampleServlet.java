@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.paypal.adaptive.api.requests.PayPalBaseRequest;
 import com.paypal.adaptive.core.APICredential;
 import com.paypal.adaptive.core.ServiceEnvironment;
 
@@ -36,6 +37,15 @@ public class AdaptiveSampleServlet extends HttpServlet {
 				"PPAccountEmail");
 		String PPEnvironment = getServletConfig().getInitParameter(
 				"PPEnvironment");
+		String HTTP_CONNECTION_TIMEOUT = getServletConfig().getInitParameter(
+				"HTTP_CONNECTION_TIMEOUT");
+		String HTTP_READ_TIMEOUT = getServletConfig().getInitParameter(
+				"HTTP_READ_TIMEOUT");
+		String DISABLE_SSL_CERT_CHECK = getServletConfig().getInitParameter(
+				"DISABLE_SSL_CERT_CHECK");
+
+
+		
 
 		if (APIUsername == null || APIUsername.length() <= 0
 				|| APIPassword == null || APIPassword.length() <= 0
@@ -51,6 +61,11 @@ public class AdaptiveSampleServlet extends HttpServlet {
 		credentialObj.setSignature(APISignature);
 		credentialObj.setAppId(AppID);
 		credentialObj.setAccountEmail(AccountEmail);
+		// set the HTTP connection configs
+		PayPalBaseRequest.DISABLE_SSL_CERT_CHECK = Boolean.parseBoolean(DISABLE_SSL_CERT_CHECK);
+		PayPalBaseRequest.HTTP_CONNECTION_TIMEOUT = Integer.parseInt(HTTP_CONNECTION_TIMEOUT);
+		PayPalBaseRequest.HTTP_READ_TIMEOUT = Integer.parseInt(HTTP_READ_TIMEOUT);
+		
 		if (PPEnvironment != null) {
 			if (PPEnvironment.equals("BETA_SANDBOX")) {
 				AdaptiveRequests.PPEnv = ServiceEnvironment.BETA_SANDBOX;
