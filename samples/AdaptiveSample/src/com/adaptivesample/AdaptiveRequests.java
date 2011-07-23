@@ -44,11 +44,16 @@ import com.paypal.adaptive.core.CurrencyCodes;
 import com.paypal.adaptive.core.CurrencyType;
 import com.paypal.adaptive.core.DisplayOptions;
 import com.paypal.adaptive.core.EndPointUrl;
+import com.paypal.adaptive.core.FeesPayerType;
+import com.paypal.adaptive.core.InvoiceData;
+import com.paypal.adaptive.core.InvoiceItem;
 import com.paypal.adaptive.core.PaymentDetails;
 import com.paypal.adaptive.core.PaymentExecStatus;
 import com.paypal.adaptive.core.PaymentOptions;
 import com.paypal.adaptive.core.PreapprovalDetails;
 import com.paypal.adaptive.core.Receiver;
+import com.paypal.adaptive.core.ReceiverIdentifier;
+import com.paypal.adaptive.core.ReceiverOptions;
 import com.paypal.adaptive.core.SenderOptions;
 import com.paypal.adaptive.core.ServiceEnvironment;
 import com.paypal.adaptive.exceptions.InvalidAPICredentialsException;
@@ -115,6 +120,10 @@ public class AdaptiveRequests {
 				paymentDetails.setSenderEmail((String) req.getParameter("email"));
 			paymentDetails.setCurrencyCode((String) req
 					.getParameter("currencyCode"));
+			// set feespayer
+			String feesPayer = req.getParameter("feesPayer");
+			if(feesPayer != null && feesPayer.length() > 0)
+				paymentDetails.setFeesPayer(FeesPayerType.valueOf(feesPayer));
 			payRequest.setClientDetails(cl);
 
 			String pkey = req.getParameter("preapprovalKey");
@@ -628,6 +637,23 @@ public class AdaptiveRequests {
 				senderOptions.setRequireShippingAddressSelection("true".equals(requireShippingAddressSelection));
 				paymentOptions.setSenderOptions(senderOptions);
 			}
+			
+			ReceiverOptions receiverOptions = new ReceiverOptions();
+			if(req.getParameter("itemname") != null) {
+				InvoiceItem invoiceItem1 = new InvoiceItem();
+				invoiceItem1.setName(req.getParameter("itemname"));
+				invoiceItem1.setPrice(req.getParameter("itemprice"));
+				InvoiceData invoiceData = new InvoiceData();
+				invoiceData.addToItem(invoiceItem1);
+				receiverOptions.setInvoiceData(invoiceData);
+			}
+			if(req.getParameter("receiveremail") != null) {
+				ReceiverIdentifier receiver = new ReceiverIdentifier();
+				receiver.setEmail(req.getParameter("receiveremail"));
+				receiverOptions.setReceiver(receiver);
+			}
+			
+			paymentOptions.addToReceiverOptions(receiverOptions);
 			
 			setPaymentOptionsReq.setPaymentOptions(paymentOptions);
 			

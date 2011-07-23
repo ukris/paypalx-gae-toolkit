@@ -32,6 +32,21 @@
 		<td><input type="text" size="50" maxlength="32" name="requireShippingAddressSelection" value="true" /></td>
 	</tr>
 	<tr>
+		<td class="thinfield">receiver email:</td>
+		<td><input type="text" size="50" maxlength="32" name="receiveremail" value="" /></td>
+	</tr>
+	<tr>
+		<td class="thinfield">invoice item name:</td>
+		<td><input type="text" size="50" maxlength="32" name="itemname" value="" /></td>
+	</tr>
+	<tr>
+		<td class="thinfield">invoice item price:</td>
+		<td><input type="text" size="50" maxlength="32" name="itemprice" value="" /></td>
+	</tr>
+	
+	
+	
+	<tr>
 		<td class="field" width="52"></td>
 		<td colspan="5"><input type="submit" value="Submit"></td>
 	</tr>
