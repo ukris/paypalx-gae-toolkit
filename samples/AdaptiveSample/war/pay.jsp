@@ -90,6 +90,16 @@
 			value=""></td>		
 	</tr>
 	<tr>
+		<td class="thinfield" width="52">feesPayer</td>
+		<td><select name="feesPayer">
+			<option value="SENDER" selected>SENDER</option>
+			<option value="PRIMARYRECEIVER">PRIMARYRECEIVER</option>
+			<option value="EACHRECEIVER">EACHRECEIVER</option>
+			<option value="SECONDARYONLY">SECONDARYONLY</option>
+		</select></td>
+	</tr>
+	
+	<tr>
 		<td class="thinfield" width="52"></td>
 		<td><input id="std_pay_button" type="submit" value="Submit"></td>
 	</tr>
