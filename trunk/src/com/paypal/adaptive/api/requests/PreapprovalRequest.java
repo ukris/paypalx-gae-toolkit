@@ -5,31 +5,23 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.paypal.adaptive.api.responses.PreapprovalResponse;
 import com.paypal.adaptive.core.APICredential;
 import com.paypal.adaptive.core.ClientDetails;
-import com.paypal.adaptive.core.EndPointUrl;
 import com.paypal.adaptive.core.ParameterUtils;
 import com.paypal.adaptive.core.PreapprovalDetails;
 import com.paypal.adaptive.core.RequestEnvelope;
 import com.paypal.adaptive.core.ServiceEnvironment;
-import com.paypal.adaptive.exceptions.AuthorizationRequiredException;
 import com.paypal.adaptive.exceptions.InvalidAPICredentialsException;
 import com.paypal.adaptive.exceptions.InvalidResponseDataException;
 import com.paypal.adaptive.exceptions.MissingAPICredentialsException;
 import com.paypal.adaptive.exceptions.MissingParameterException;
-import com.paypal.adaptive.exceptions.PayPalErrorException;
 import com.paypal.adaptive.exceptions.PaymentExecException;
 import com.paypal.adaptive.exceptions.RequestFailureException;
 
@@ -39,15 +31,13 @@ import com.paypal.adaptive.exceptions.RequestFailureException;
 sender’s behalf.
  * 
  */
-public class PreapprovalRequest {
+public class PreapprovalRequest extends PayPalBaseRequest{
 
 	private static final Logger log = Logger.getLogger(PreapprovalRequest.class.getName());
 
 
     protected ClientDetails clientDetails;
     protected PreapprovalDetails preapprovalDetails;
-    protected RequestEnvelope requestEnvelope;
-    protected ServiceEnvironment env;
     
     
     public PreapprovalRequest(String language, ServiceEnvironment env){
@@ -135,50 +125,8 @@ public class PreapprovalRequest {
     	if(log.isLoggable(Level.INFO))
     		log.info("Sending PreapprovalRequest with: " + postParameters.toString());
     	
-    	// create HTTP Request
-    	try {
-            URL url = new URL(EndPointUrl.get(this.env) + "Preapproval");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            // method is always POST
-            connection.setRequestMethod("POST");
-            // set HTTP headers
-            connection.setRequestProperty("X-PAYPAL-SECURITY-USERID", credentialObj.getAPIUsername());
-            connection.setRequestProperty("X-PAYPAL-SECURITY-PASSWORD", credentialObj.getAPIPassword());
-            connection.setRequestProperty("X-PAYPAL-SECURITY-SIGNATURE", credentialObj.getSignature());
-            connection.setRequestProperty("X-PAYPAL-REQUEST-DATA-FORMAT", "NV");
-            connection.setRequestProperty("X-PAYPAL-RESPONSE-DATA-FORMAT", "NV");
-            connection.setRequestProperty("X-PAYPAL-APPLICATION-ID", credentialObj.getAppId());
-            connection.setRequestProperty("X-PAYPAL-REQUEST-SOURCE", "GAE-JAVA_Toolkit");
-
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(postParameters.toString());
-            writer.close();
-    
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            	String inputLine;
-            	BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-                    while ((inputLine = reader.readLine()) != null) {
-                    	responseString += inputLine;
-                    }
-        	    reader.close();
-        	    if(responseString.length() <= 0){
-        	    	throw new InvalidResponseDataException(responseString);
-        	    }
-        	    if(log.isLoggable(Level.INFO))
-            		log.info("Received PreapprovalResponse: " + responseString);
-            	
-            } else {
-                // Server returned HTTP error code.
-            	throw new RequestFailureException(connection.getResponseCode());
-            }
-        } catch (MalformedURLException e) {
-            // ...
-        	throw e;
-        } catch (IOException e) {
-            // ...
-        	throw e;
-        }
+    	// send request
+		responseString = makeRequest(credentialObj, "Preapproval", postParameters.toString());
         
     	// parse response
         PreapprovalResponse response = new PreapprovalResponse(responseString);

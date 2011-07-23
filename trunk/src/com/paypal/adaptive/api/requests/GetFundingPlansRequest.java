@@ -7,19 +7,12 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.paypal.adaptive.api.responses.GetFundingPlansResponse;
 import com.paypal.adaptive.core.APICredential;
-import com.paypal.adaptive.core.EndPointUrl;
 import com.paypal.adaptive.core.ParameterUtils;
 import com.paypal.adaptive.core.RequestEnvelope;
 import com.paypal.adaptive.core.ServiceEnvironment;
@@ -34,12 +27,10 @@ import com.paypal.adaptive.exceptions.RequestFailureException;
  * PaymentDetails API provides information about a payment set up with the Pay API operation.
  * 
  */
-public class GetFundingPlansRequest{
+public class GetFundingPlansRequest extends PayPalBaseRequest{
 
 	private static final Logger log = Logger.getLogger(GetFundingPlansRequest.class.getName());
 
-	protected RequestEnvelope requestEnvelope;
-	private ServiceEnvironment env;
 	protected String payKey;
 
  
@@ -81,52 +72,8 @@ public class GetFundingPlansRequest{
     	if(log.isLoggable(Level.INFO))
     		log.info("Sending GetFundingPlansRequest with: " + postParameters.toString());    	
     	
-    	try {
-            URL url = new URL(EndPointUrl.get(this.env) + "GetFundingPlans");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            // method is always POST
-            connection.setRequestMethod("POST");
-            // set HTTP headers
-            connection.setRequestProperty("X-PAYPAL-SECURITY-USERID", credentialObj.getAPIUsername());
-            connection.setRequestProperty("X-PAYPAL-SECURITY-PASSWORD", credentialObj.getAPIPassword());
-            connection.setRequestProperty("X-PAYPAL-SECURITY-SIGNATURE", credentialObj.getSignature());
-            connection.setRequestProperty("X-PAYPAL-REQUEST-DATA-FORMAT", "NV");
-            connection.setRequestProperty("X-PAYPAL-RESPONSE-DATA-FORMAT", "NV");
-            connection.setRequestProperty("X-PAYPAL-APPLICATION-ID", credentialObj.getAppId());
-            connection.setRequestProperty("X-PAYPAL-REQUEST-SOURCE", "GAE-JAVA_Toolkit");
-            
-            System.out.println(connection.toString());
-            System.out.println(postParameters.toString());
-            
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(postParameters.toString());
-            writer.close();
-    
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            	String inputLine;
-            	BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-                    while ((inputLine = reader.readLine()) != null) {
-                    	responseString += inputLine;
-                    }
-        	    reader.close();
-        	    if(responseString.length() <= 0){
-        	    	throw new InvalidResponseDataException(responseString);
-        	    }
-        	    if(log.isLoggable(Level.INFO))
-            		log.info("Received PaymentDetails Response: " + responseString);
-            } else {
-                // Server returned HTTP error code.
-            	throw new RequestFailureException(connection.getResponseCode());
-            }
-        } catch (MalformedURLException e) {
-            // ...
-        	throw e;
-        } catch (IOException e) {
-            // ...
-        	throw e;
-        }
     	// send request
+		responseString = makeRequest(credentialObj, "GetFundingPlans", postParameters.toString());
     	    	
     	// parse response
         GetFundingPlansResponse response = new GetFundingPlansResponse(responseString);

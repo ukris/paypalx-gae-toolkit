@@ -28,34 +28,35 @@ public class InvoiceData {
 		item = new ArrayList<InvoiceItem>();
 	}
 	
-	public InvoiceData(HashMap<String, String> params) {
+	public InvoiceData(HashMap<String, String> params, String prefix) {
 		for(int i=0; i<10;i++){
-			if(params.containsKey("receiverOptions.invoiceData.item("+i+").name")
-					|| params.containsKey("receiverOptions.invoiceData.item("+i+").identifier")
-					|| params.containsKey("receiverOptions.invoiceData.item("+i+").price")
-					|| params.containsKey("receiverOptions.invoiceData.item("+i+").itemPrice")
-					|| params.containsKey("receiverOptions.invoiceData.item("+i+").itemCount")){
-				InvoiceItem invoiceItem = new InvoiceItem(params, "receiverOptions.invoiceData.item",i);
+			if(params.containsKey( prefix+".invoiceData.item("+i+").name")
+					|| params.containsKey( prefix+".invoiceData.item("+i+").identifier")
+					|| params.containsKey( prefix+".invoiceData.item("+i+").price")
+					|| params.containsKey( prefix+".invoiceData.item("+i+").itemPrice")
+					|| params.containsKey( prefix+".invoiceData.item("+i+").itemCount")){
+				InvoiceItem invoiceItem = new InvoiceItem(params,  prefix+".invoiceData.item",i);
 				this.addToItem(invoiceItem);
 			} else {
 				break;
 			}
 		}
-		if(params.containsKey("")){
-			this.totalShipping = Double.parseDouble(params.get(""));
+		if(params.containsKey( prefix+".invoiceData.totalShipping")){
+			this.totalShipping = Double.parseDouble(params.get(prefix+".invoiceData.totalShipping"));
 		}
-		if(params.containsKey("")){
-			this.totalTax = Double.parseDouble(params.get(""));
+		if(params.containsKey(prefix+".invoiceData.totalTax")){
+			this.totalTax = Double.parseDouble(params.get(prefix+".invoiceData.totalTax"));
 		}
 	}
 
-	public String serialize() throws UnsupportedEncodingException{
+	public String serialize(String prefix) throws UnsupportedEncodingException{
 		StringBuilder outString = new StringBuilder();
 		boolean isFirst = true;
 		if(item != null) {
 			int i = 0;
 	    	for(InvoiceItem itm: item){
-	    		outString.append(itm.serialize("receiverOptions.invoiceData.item", i));
+	    		if(!isFirst) outString.append(ParameterUtils.PARAM_SEP);
+	    		outString.append(itm.serialize( prefix + ".invoiceData.item", i));
 	    		i++;
 	    		isFirst = false;
 	    	}
@@ -63,12 +64,12 @@ public class InvoiceData {
 		
 		if(this.totalTax != -1) {
 			if(!isFirst) outString.append(ParameterUtils.PARAM_SEP);
-			outString.append(ParameterUtils.createUrlParameter("receiverOptions.invoiceData.totalTax", Double.toString(this.totalTax)));
+			outString.append(ParameterUtils.createUrlParameter(prefix + ".invoiceData.totalTax", Double.toString(this.totalTax)));
 			isFirst = false;
 		}
 		if(this.totalShipping != -1) {
 			if(!isFirst) outString.append(ParameterUtils.PARAM_SEP);
-			outString.append(ParameterUtils.createUrlParameter("receiverOptions.invoiceData.totalShipping", Double.toString(this.totalShipping)));
+			outString.append(ParameterUtils.createUrlParameter(prefix + ".invoiceData.totalShipping", Double.toString(this.totalShipping)));
 			isFirst = false;
 		}
 		

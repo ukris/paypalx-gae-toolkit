@@ -5,7 +5,9 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class PaymentOptions {
 	
@@ -13,7 +15,7 @@ public class PaymentOptions {
 	protected DisplayOptions displayOptions;
 	protected String shippingAddressId;
 	protected SenderOptions senderOptions;
-	protected ReceiverOptions receiverOptions;
+	protected List<ReceiverOptions> receiverOptions;
 
 	/**
 	 * @return the initiatingEntity
@@ -66,15 +68,25 @@ public class PaymentOptions {
 	/**
 	 * @return the receiverOptions
 	 */
-	public ReceiverOptions getReceiverOptions() {
+	public List<ReceiverOptions> getReceiverOptions() {
 		return receiverOptions;
 	}
 	/**
 	 * @param receiverOptions the receiverOptions to set
 	 */
-	public void setReceiverOptions(ReceiverOptions receiverOptions) {
+	public void setReceiverOptions(List<ReceiverOptions> receiverOptions) {
 		this.receiverOptions = receiverOptions;
 	}
+	/**
+	 * @param receiverOptions the invoiceItem to set
+	 */
+	public void addToReceiverOptions(ReceiverOptions receiverOptions) {
+		if(this.receiverOptions == null)
+			this.receiverOptions = new ArrayList<ReceiverOptions>();
+		
+		this.receiverOptions.add(receiverOptions);
+	}
+	
 
 	public PaymentOptions(){
 		// default constructor
@@ -92,7 +104,15 @@ public class PaymentOptions {
 		
 		this.senderOptions = new SenderOptions(params);
 		
-		this.receiverOptions = new ReceiverOptions(params);
+		for(int i=0; i < 10; i++){
+			if(params.containsKey("receiverOptions("+i+").receiver.email")
+					|| params.containsKey("receiverOptions("+i+").receiver.email")){
+				ReceiverOptions receiverOptions = new ReceiverOptions(params, i);
+				this.addToReceiverOptions(receiverOptions);
+			} else {
+				break;
+			}
+		}
 		
 	}
 	
@@ -120,10 +140,14 @@ public class PaymentOptions {
 			postParameters.append(ParameterUtils.PARAM_SEP);        	
 		}
 		// add receiverOptions if set
-		if(this.receiverOptions != null) {
-			postParameters.append(this.receiverOptions.serialize());
-			postParameters.append(ParameterUtils.PARAM_SEP);        	
-		}
+		int i = 0;
+    	if(receiverOptions != null) {
+	    	for(ReceiverOptions recvrOpts: receiverOptions){
+	    		postParameters.append(recvrOpts.serialize(i));
+	    		i++;
+	    	}
+    	}
+    	
 
 		return postParameters.toString();
 	}
