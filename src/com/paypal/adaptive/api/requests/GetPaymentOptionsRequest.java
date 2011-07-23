@@ -5,19 +5,12 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.paypal.adaptive.api.responses.GetPaymentOptionsResponse;
 import com.paypal.adaptive.core.APICredential;
-import com.paypal.adaptive.core.EndPointUrl;
 import com.paypal.adaptive.core.ParameterUtils;
 import com.paypal.adaptive.core.RequestEnvelope;
 import com.paypal.adaptive.core.ServiceEnvironment;
@@ -30,13 +23,11 @@ import com.paypal.adaptive.exceptions.RequestFailureException;
  * CancelPreapprovel API cancels a preapproval set up with the Preapproval API operation. 
  * 
  */
-public class GetPaymentOptionsRequest {
+public class GetPaymentOptionsRequest extends PayPalBaseRequest{
 
 	private static final Logger log = Logger.getLogger(GetPaymentOptionsRequest.class.getName());
 
-    protected RequestEnvelope requestEnvelope;
     protected String payKey;
-	private ServiceEnvironment env;
 
     
     public GetPaymentOptionsRequest(String language, ServiceEnvironment env){
@@ -117,52 +108,8 @@ public class GetPaymentOptionsRequest {
     	if(log.isLoggable(Level.INFO))
     		log.info("Sending GetPaymentOptionsRequest with: " + postParameters.toString());
     	
-    	try {
-            URL url = new URL(EndPointUrl.get(this.env) + "GetPaymentOptions");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            // method is always POST
-            connection.setRequestMethod("POST");
-            // set HTTP headers
-            connection.setRequestProperty("X-PAYPAL-SECURITY-USERID", credentialObj.getAPIUsername());
-            connection.setRequestProperty("X-PAYPAL-SECURITY-PASSWORD", credentialObj.getAPIPassword());
-            connection.setRequestProperty("X-PAYPAL-SECURITY-SIGNATURE", credentialObj.getSignature());
-            connection.setRequestProperty("X-PAYPAL-REQUEST-DATA-FORMAT", "NV");
-            connection.setRequestProperty("X-PAYPAL-RESPONSE-DATA-FORMAT", "NV");
-            connection.setRequestProperty("X-PAYPAL-APPLICATION-ID", credentialObj.getAppId());
-            connection.setRequestProperty("X-PAYPAL-REQUEST-SOURCE", "GAE-JAVA_Toolkit");
-            
-            System.out.println(connection.toString());
-            System.out.println(postParameters.toString());
-            
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(postParameters.toString());
-            writer.close();
-    
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            	String inputLine;
-            	BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-                    while ((inputLine = reader.readLine()) != null) {
-                    	responseString += inputLine;
-                    }
-        	    reader.close();
-        	    if(responseString.length() <= 0){
-        	    	throw new InvalidResponseDataException(responseString);
-        	    }
-        	    if(log.isLoggable(Level.INFO))
-            		log.info("Received GetPaymentOptionsResponse: " + responseString);
-            } else {
-                // Server returned HTTP error code.
-            	throw new RequestFailureException(connection.getResponseCode());
-            }
-        } catch (MalformedURLException e) {
-            // ...
-        	throw e;
-        } catch (IOException e) {
-            // ...
-        	throw e;
-        }
     	// send request
+		responseString = makeRequest(credentialObj, "GetPaymentOptions", postParameters.toString());
     	    	
     	// parse response
         GetPaymentOptionsResponse response = new GetPaymentOptionsResponse(responseString);

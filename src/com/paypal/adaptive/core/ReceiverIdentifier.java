@@ -83,26 +83,26 @@ public class ReceiverIdentifier {
         this.email = value;
     }
 	
-	public String serialize() throws UnsupportedEncodingException{
+	public String serialize(String prefix) throws UnsupportedEncodingException{
 		StringBuilder outString = new StringBuilder();
 		boolean isFirst = true;
 		if(this.email != null && this.email.length() > 0) {
-			outString.append(ParameterUtils.createUrlParameter( "receiver.email", this.email));
+			outString.append(ParameterUtils.createUrlParameter( prefix + ".receiver.email", this.email));
 			isFirst = false;
 		}
 		if(this.phone != null && this.phone.countryCode != -1) {
 			if(!isFirst) outString.append(ParameterUtils.PARAM_SEP);
-			outString.append(ParameterUtils.createUrlParameter( "receiver.phone.countryCode", Double.toString(this.phone.countryCode)));
+			outString.append(ParameterUtils.createUrlParameter( prefix + ".receiver.phone.countryCode", Double.toString(this.phone.countryCode)));
 			isFirst = false;
 		}
 		if(this.phone != null && this.phone.phoneNumber != -1) {
 			if(!isFirst) outString.append(ParameterUtils.PARAM_SEP);
-			outString.append(ParameterUtils.createUrlParameter( "receiver.phone.phoneNumber", Double.toString(this.phone.phoneNumber)));
+			outString.append(ParameterUtils.createUrlParameter( prefix + ".receiver.phone.phoneNumber", Double.toString(this.phone.phoneNumber)));
 			isFirst = false;
 		}
 		if(this.phone != null && this.phone.extension != -1) {
 			if(!isFirst) outString.append(ParameterUtils.PARAM_SEP);
-			outString.append(ParameterUtils.createUrlParameter( "receiver.phone.extension", Double.toString(this.phone.extension)));
+			outString.append(ParameterUtils.createUrlParameter( prefix + ".receiver.phone.extension", Double.toString(this.phone.extension)));
 		}
 		return outString.toString();
 	}
